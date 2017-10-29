@@ -108,6 +108,7 @@ $Conf{RsyncClientRestoreCmd} = '$sshPath -q -x -l root $host $rsyncPath $argList
 $Conf{RsyncShareName} = '/';
 $Conf{RsyncdClientPort} = 873;
 $Conf{RsyncdUserName} = '';
+$Conf{RsyncSshArgs} = <% if @rsync_ssh_args.is_a?(Array) %>['<%= @rsync_ssh_args.join("', '") %>']<% else %>['<%= @rsync_ssh_args %>']<% end %>;
 $Conf{RsyncdPasswd} = '';
 $Conf{RsyncdAuthRequired} = 1;
 $Conf{RsyncCsumCacheVerifyProb} = 0.01;
@@ -264,6 +265,7 @@ $Conf{CgiUserConfigEdit} = {
         IncrAgeMax                => 1,
         IncrLevels                => 1,
         IncrFill                  => 1,
+        RsyncSshArgs              => 1,
         PartialAgeMax             => 1,
         RestoreInfoKeepCnt        => 1,
         ArchiveInfoKeepCnt        => 1,

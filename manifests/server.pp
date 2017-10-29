@@ -158,6 +158,9 @@
 # errors that result in no files being backed up. If you have shares that might be
 # empty (and therefore an empty backup is valid) you should set this to false.
 #
+# [*rsync_ssh_args*]
+# Array. Passes the ssh arguments like login user and escape_char. Default: '-e', '$sshPath -l backup'
+#
 # [*email_notify_min_days*]
 # Minimum period between consecutive emails to a single user. This tries to keep annoying email to users to
 # a reasonable level.
@@ -245,6 +248,7 @@ class backuppc::server (
                                     weekDays  => [1, 2, 3, 4, 5],
                                 }, ],
   $blackout_zero_files_is_fatal = true,
+  $rsync_ssh_args             = [ '-e', "\$sshPath -l backup" ],
   $email_notify_min_days      = 2.5,
   $email_from_user_name       = 'backuppc',
   $email_admin_user_name      = 'backuppc',
