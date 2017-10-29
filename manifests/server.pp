@@ -161,6 +161,9 @@
 # [*rsync_ssh_args*]
 # Array. Passes the ssh arguments like login user and escape_char. Default: '-e', '$sshPath -l backup'
 #
+# [*rsync_backuppc_path*]
+# Full path to rsync_bpc on the server. Rsync_bpc is the customized version of rsync that is used on the server for rsync and rsyncd transfers.
+#
 # [*email_notify_min_days*]
 # Minimum period between consecutive emails to a single user. This tries to keep annoying email to users to
 # a reasonable level.
@@ -230,6 +233,7 @@ class backuppc::server (
   $df_max_usage_pct           = 95,
   $trash_clean_sleep_sec      = 300,
   $dhcp_address_ranges        = [],
+  $rsync_backuppc_path        = '/usr/local/bin/rsync_bpc',
   $full_period                = '6.97',
   $full_keep_cnt              = [1],
   $full_age_max               = 90,
