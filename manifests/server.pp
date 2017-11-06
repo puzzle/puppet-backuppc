@@ -11,7 +11,7 @@
 # Boolean. Will enable service at boot
 # and ensure a running service.
 #
-# [*wakup_schedule*]
+# [*wakeup_schedule*]
 # Times at which we wake up, check all the PCs,
 # and schedule necessary backups. Times are measured
 # in hours since midnight. Can be fractional if
