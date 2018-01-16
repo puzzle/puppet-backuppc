@@ -106,7 +106,7 @@ $Conf{TarClientPath} = '<%= scope.lookupvar('backuppc::params::tar_path') %>';
 $Conf{RsyncClientPath} = '/usr/bin/rsync';
 $Conf{RsyncClientCmd} = '$sshPath -q -x -l root $host $rsyncPath $argList+';
 $Conf{RsyncClientRestoreCmd} = '$sshPath -q -x -l root $host $rsyncPath $argList+';
-$Conf{RsyncShareName} = '/';
+$Conf{RsyncShareName} = [ '/' ];
 $Conf{RsyncdClientPort} = 873;
 $Conf{RsyncdUserName} = '';
 $Conf{RsyncSshArgs} = <% if @rsync_ssh_args.is_a?(Array) %>['<%= @rsync_ssh_args.join("', '") %>']<% else %>['<%= @rsync_ssh_args %>']<% end %>;
