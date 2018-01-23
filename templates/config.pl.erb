@@ -42,6 +42,7 @@ $Conf{ConfDir}     = '<%= scope.lookupvar('backuppc::params::config_directory') 
 $Conf{LogDir}      = '<%= scope.lookupvar('backuppc::server::real_log_directory') %>';
 $Conf{InstallDir}  = '<%= scope.lookupvar('backuppc::params::install_directory') %>';
 $Conf{CgiDir}      = '<%= scope.lookupvar('backuppc::params::cgi_directory') %>';
+$Conf{RrdToolPath} = '<%= @rrdtool_path %>';
 $Conf{BackupPCUserVerify} = 1;
 $Conf{HardLinkMax} = 31999;
 $Conf{PerlModuleLoad}     = undef;

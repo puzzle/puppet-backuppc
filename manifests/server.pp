@@ -208,6 +208,9 @@
 # [*topdir*]
 # Overwrite package default location for backuppc.
 #
+# [*rrdtool_path*]
+# If you installed/compiled backuppc before rrdtool you can specify the rrdtool path.
+#
 # [*pingmaxmsec*]
 # Maximum RTT value (in ms) above which backup won't be started. Default to 20ms
 #
@@ -265,6 +268,7 @@ class backuppc::server (
   $apache_require_ssl         = false,
   $backuppc_password          = '',
   $topdir                     = $backuppc::params::topdir,
+  $rrdtool_path               = '',
   $cgi_image_dir_url          = $backuppc::params::cgi_image_dir_url,
   $cgi_admin_users            = 'backuppc',
   $cgi_admin_user_group       = 'backuppc',
