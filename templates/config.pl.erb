@@ -118,16 +118,24 @@ $Conf{RsyncArgs} = [
       #
       # Do not edit these!
       #
+            '--super',
+            '--recursive',
+            '--protect-args',
             '--numeric-ids',
             '--perms',
             '--owner',
             '--group',
             '-D',
+            '--times',
             '--links',
             '--hard-links',
-            '--times',
-            '--block-size=2048',
-            '--recursive',
+            '--delete',
+            '--delete-excluded',
+            '--one-file-system',
+            '--partial',
+            '--log-format=log: %o %i %B %8U,%8G %9l %f%L',
+            '--stats',
+
       #
       # Rsync >= 2.6.3 supports the --checksum-seed option
             # which allows rsync checksum caching on the server.
