@@ -149,6 +149,9 @@ $Conf{RsyncArgs} = [
       # Add additional arguments here
       #
 ];
+$Conf{RsyncFullArgsExtra} = [
+      '--checksum',
+];
 $Conf{RsyncRestoreArgs} = [
       #
       # Do not edit these!
@@ -307,6 +310,7 @@ $Conf{CgiUserConfigEdit} = {
         RsyncdClientPort          => 1,
         RsyncdPasswd              => 1,
         RsyncdUserName            => 1,
+        RsyncFullArgsExtra        => 1,
         RsyncdAuthRequired        => 1,
         RsyncCsumCacheVerifyProb  => 1,
         RsyncArgs                 => 1,
