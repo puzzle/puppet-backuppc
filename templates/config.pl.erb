@@ -11,6 +11,7 @@ $Conf{ServerPort} = -1;
 $Conf{ServerMesgSecret} = '';
 $Conf{MyPath} = '/bin';
 $Conf{UmaskMode} = 027;
+$Conf{RefCntFsck} = <%= @ref_cnt_fsck %>;
 $Conf{WakeupSchedule} = [<%= @wakeup_schedule.join(', ') %>];
 $Conf{MaxBackups} = <%= @max_backups %>;
 $Conf{MaxUserBackups} = <%= @max_user_backups %>;

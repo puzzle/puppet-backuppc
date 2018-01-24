@@ -161,6 +161,10 @@
 # [*rsync_ssh_args*]
 # Array. Passes the ssh arguments like login user and escape_char. Default: '-e', '$sshPath -l backup'
 #
+# [*ref_cnt_fsck*]
+# Reference counts of pool files are computed per backup by accumulating
+# the relative changes. Default: 1 is the recommended setting.
+#
 # [*rsync_backuppc_path*]
 # Full path to rsync_bpc on the server. Rsync_bpc is the customized version of rsync that is used on the server for rsync and rsyncd transfers.
 #
@@ -256,6 +260,7 @@ class backuppc::server (
                                 }, ],
   $blackout_zero_files_is_fatal = true,
   $rsync_ssh_args             = [ '-e', "\$sshPath -l backup" ],
+  $ref_cnt_fsck                 = 1,
   $email_notify_min_days      = 2.5,
   $email_from_user_name       = 'backuppc',
   $email_admin_user_name      = 'backuppc',
