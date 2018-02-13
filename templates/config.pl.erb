@@ -11,6 +11,7 @@ $Conf{ServerPort} = -1;
 $Conf{ServerMesgSecret} = '';
 $Conf{MyPath} = '/bin';
 $Conf{UmaskMode} = 027;
+$Conf{RefCntFsck} = <%= @ref_cnt_fsck %>;
 $Conf{WakeupSchedule} = [<%= @wakeup_schedule.join(', ') %>];
 $Conf{MaxBackups} = <%= @max_backups %>;
 $Conf{MaxUserBackups} = <%= @max_user_backups %>;
@@ -42,10 +43,12 @@ $Conf{ConfDir}     = '<%= scope.lookupvar('backuppc::params::config_directory') 
 $Conf{LogDir}      = '<%= scope.lookupvar('backuppc::server::real_log_directory') %>';
 $Conf{InstallDir}  = '<%= scope.lookupvar('backuppc::params::install_directory') %>';
 $Conf{CgiDir}      = '<%= scope.lookupvar('backuppc::params::cgi_directory') %>';
+$Conf{RrdToolPath} = '<%= @rrdtool_path %>';
 $Conf{BackupPCUserVerify} = 1;
 $Conf{HardLinkMax} = 31999;
 $Conf{PerlModuleLoad}     = undef;
 $Conf{ServerInitdPath} = '';
+$Conf{RsyncBackupPCPath} = '<%= @rsync_backuppc_path %>';
 $Conf{ServerInitdStartCmd} = '';
 $Conf{FullPeriod} = <%= @full_period %>;
 $Conf{IncrPeriod} = <%= @incr_period %>;
@@ -105,9 +108,10 @@ $Conf{TarClientPath} = '<%= scope.lookupvar('backuppc::params::tar_path') %>';
 $Conf{RsyncClientPath} = '/usr/bin/rsync';
 $Conf{RsyncClientCmd} = '$sshPath -q -x -l root $host $rsyncPath $argList+';
 $Conf{RsyncClientRestoreCmd} = '$sshPath -q -x -l root $host $rsyncPath $argList+';
-$Conf{RsyncShareName} = '/';
+$Conf{RsyncShareName} = [ '/' ];
 $Conf{RsyncdClientPort} = 873;
 $Conf{RsyncdUserName} = '';
+$Conf{RsyncSshArgs} = <% if @rsync_ssh_args.is_a?(Array) %>['<%= @rsync_ssh_args.join("', '") %>']<% else %>['<%= @rsync_ssh_args %>']<% end %>;
 $Conf{RsyncdPasswd} = '';
 $Conf{RsyncdAuthRequired} = 1;
 $Conf{RsyncCsumCacheVerifyProb} = 0.01;
@@ -115,16 +119,24 @@ $Conf{RsyncArgs} = [
       #
       # Do not edit these!
       #
+            '--super',
+            '--recursive',
+            '--protect-args',
             '--numeric-ids',
             '--perms',
             '--owner',
             '--group',
             '-D',
+            '--times',
             '--links',
             '--hard-links',
-            '--times',
-            '--block-size=2048',
-            '--recursive',
+            '--delete',
+            '--delete-excluded',
+            '--one-file-system',
+            '--partial',
+            '--log-format=log: %o %i %B %8U,%8G %9l %f%L',
+            '--stats',
+
       #
       # Rsync >= 2.6.3 supports the --checksum-seed option
             # which allows rsync checksum caching on the server.
@@ -136,6 +148,9 @@ $Conf{RsyncArgs} = [
       #
       # Add additional arguments here
       #
+];
+$Conf{RsyncFullArgsExtra} = [
+      '--checksum',
 ];
 $Conf{RsyncRestoreArgs} = [
       #
@@ -264,6 +279,7 @@ $Conf{CgiUserConfigEdit} = {
         IncrAgeMax                => 1,
         IncrLevels                => 1,
         IncrFill                  => 1,
+        RsyncSshArgs              => 1,
         PartialAgeMax             => 1,
         RestoreInfoKeepCnt        => 1,
         ArchiveInfoKeepCnt        => 1,
@@ -294,6 +310,7 @@ $Conf{CgiUserConfigEdit} = {
         RsyncdClientPort          => 1,
         RsyncdPasswd              => 1,
         RsyncdUserName            => 1,
+        RsyncFullArgsExtra        => 1,
         RsyncdAuthRequired        => 1,
         RsyncCsumCacheVerifyProb  => 1,
         RsyncArgs                 => 1,

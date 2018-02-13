@@ -11,7 +11,7 @@
 # Boolean. Will enable service at boot
 # and ensure a running service.
 #
-# [*wakup_schedule*]
+# [*wakeup_schedule*]
 # Times at which we wake up, check all the PCs,
 # and schedule necessary backups. Times are measured
 # in hours since midnight. Can be fractional if
@@ -158,6 +158,16 @@
 # errors that result in no files being backed up. If you have shares that might be
 # empty (and therefore an empty backup is valid) you should set this to false.
 #
+# [*rsync_ssh_args*]
+# Array. Passes the ssh arguments like login user and escape_char. Default: '-e', '$sshPath -l backup'
+#
+# [*ref_cnt_fsck*]
+# Reference counts of pool files are computed per backup by accumulating
+# the relative changes. Default: 1 is the recommended setting.
+#
+# [*rsync_backuppc_path*]
+# Full path to rsync_bpc on the server. Rsync_bpc is the customized version of rsync that is used on the server for rsync and rsyncd transfers.
+#
 # [*email_notify_min_days*]
 # Minimum period between consecutive emails to a single user. This tries to keep annoying email to users to
 # a reasonable level.
@@ -202,6 +212,9 @@
 # [*topdir*]
 # Overwrite package default location for backuppc.
 #
+# [*rrdtool_path*]
+# If you installed/compiled backuppc before rrdtool you can specify the rrdtool path.
+#
 # [*pingmaxmsec*]
 # Maximum RTT value (in ms) above which backup won't be started. Default to 20ms
 #
@@ -227,6 +240,7 @@ class backuppc::server (
   $df_max_usage_pct           = 95,
   $trash_clean_sleep_sec      = 300,
   $dhcp_address_ranges        = [],
+  $rsync_backuppc_path        = '/usr/local/bin/rsync_bpc',
   $full_period                = '6.97',
   $full_keep_cnt              = [1],
   $full_age_max               = 90,
@@ -245,6 +259,8 @@ class backuppc::server (
                                     weekDays  => [1, 2, 3, 4, 5],
                                 }, ],
   $blackout_zero_files_is_fatal = true,
+  $rsync_ssh_args             = [ '-e', "\$sshPath -l backup" ],
+  $ref_cnt_fsck                 = 1,
   $email_notify_min_days      = 2.5,
   $email_from_user_name       = 'backuppc',
   $email_admin_user_name      = 'backuppc',
@@ -257,6 +273,7 @@ class backuppc::server (
   $apache_require_ssl         = false,
   $backuppc_password          = '',
   $topdir                     = $backuppc::params::topdir,
+  $rrdtool_path               = '',
   $cgi_image_dir_url          = $backuppc::params::cgi_image_dir_url,
   $cgi_admin_users            = 'backuppc',
   $cgi_admin_user_group       = 'backuppc',

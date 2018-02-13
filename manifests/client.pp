@@ -418,6 +418,7 @@ class backuppc::client (
     }
 
     Ssh_authorized_key <<| tag == "backuppc_${backuppc_hostname}" |>> {
+      ensure  => $ensure,
       user    => $system_account,
       require => File["${system_home_directory}/.ssh"]
     }
