@@ -218,6 +218,10 @@
 # [*pingmaxmsec*]
 # Maximum RTT value (in ms) above which backup won't be started. Default to 20ms
 #
+# [*manage_ssh*]
+# Default: true
+# Manage sshkey export and collection
+#
 # === Examples
 #
 #  See tests folder.
@@ -279,7 +283,8 @@ class backuppc::server (
   $cgi_admin_user_group       = 'backuppc',
   $cgi_date_format_mmdd       = 1,
   $user_cmd_check_status      = true,
-  $pingmaxmsec                = 20
+  $pingmaxmsec                = 20,
+  $manage_ssh                 = true,
 ) inherits backuppc::params  {
 
   if empty($backuppc_password) {
@@ -469,17 +474,6 @@ class backuppc::server (
     }
   }
 
-  exec { 'backuppc-ssh-keygen':
-    command => "ssh-keygen -f ${real_topdir}/.ssh/id_rsa -C 'BackupPC on ${::fqdn}' -N ''",
-    user    => 'backuppc',
-    unless  => "test -f ${real_topdir}/.ssh/id_rsa",
-    path    => ['/usr/bin','/bin'],
-    require => [
-        Package[$backuppc::params::package],
-        File["${real_topdir}/.ssh"],
-    ],
-  }
-
   # BackupPC apache configuration
   if $apache_configuration {
     file { $backuppc::params::config_apache:
@@ -491,26 +485,6 @@ class backuppc::server (
     # Create the default admin account
     backuppc::server::user { 'backuppc':
       password => $backuppc_password
-    }
-  }
-
-  # Export backuppc's authorized key to all clients
-  # TODO don't rely on facter to obtain the ssh key.
-  if $facts['backuppc_pubkey_rsa'] != undef {
-    @@ssh_authorized_key { "backuppc_${::fqdn}":
-      ensure  => present,
-      key     => $::backuppc_pubkey_rsa,
-      name    => "backuppc_${::fqdn}",
-      user    => 'backup',
-      options => [
-        'command="~/backuppc.sh"',
-        'no-agent-forwarding',
-        'no-port-forwarding',
-        'no-pty',
-        'no-X11-forwarding',
-      ],
-      type    => 'ssh-rsa',
-      tag     => "backuppc_${::fqdn}",
     }
   }
 
@@ -538,5 +512,5 @@ class backuppc::server (
     notify  => Service[$backuppc::params::service],
   }
 
-  Sshkey <<| tag == "backuppc_sshkeys_${::fqdn}" |>>
+  if $manage_ssh { include backuppc::server::ssh }
 }
