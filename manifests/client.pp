@@ -43,6 +43,16 @@
 # is useful if you need to execute any pre dump commands on client before
 # backup.
 #
+# [*manage_ssh*]
+# Default: true
+# Manage sshkey export and collection
+# Boolean. By default will manage the generation and deployment of the 
+# sshkey and authorized keys. If you manage this elsewhere set it to false. 
+# Defaults to true and  is only applied if 1) the xfer_method is rsync and
+# 2) you're using the system_account parameter. 
+# Additional options in class backuppc::client::ssh
+# Also check backuppc::server::manage_ssh and class backuppc::server::ssh
+#
 # [*manage_sudo*]
 # Boolean. Set to true to configure and install sudo and the
 # sudoers.d directory. Defaults to false and is only applied
@@ -288,8 +298,9 @@ class backuppc::client (
   $email_notify_old_backup_days = false,
   $hosts_file_dhcp       = 0,
   $hosts_file_more_users = '',
-  $sudo_prepend = '',
-    ) {
+  $sudo_prepend          = '',
+  $manage_ssh            = true,
+) {
   include backuppc::params
 
   validate_re($ensure, '^(present|absent)$',
@@ -401,13 +412,6 @@ class backuppc::client (
       password   => '*',
     }
 
-    file { "${system_home_directory}/.ssh":
-      ensure => $directory_ensure,
-      mode   => '0700',
-      owner  => $system_account,
-      group  => $system_account,
-    }
-
     file { "${system_home_directory}/backuppc.sh":
       ensure  => $ensure,
       owner   => 'root',
@@ -416,21 +420,7 @@ class backuppc::client (
       content => template('backuppc/client/backuppc.sh.erb'),
       require => User[$system_account],
     }
-
-    Ssh_authorized_key <<| tag == "backuppc_${backuppc_hostname}" |>> {
-      ensure  => $ensure,
-      user    => $system_account,
-      require => File["${system_home_directory}/.ssh"]
-    }
-  }
-
-  if $::fqdn != $backuppc_hostname {
-    @@sshkey { $::fqdn:
-      ensure => $ensure,
-      type   => 'ssh-rsa',
-      key    => $::sshrsakey,
-      tag    => "backuppc_sshkeys_${backuppc_hostname}",
-    }
+    if $manage_ssh { include backuppc::client::ssh }
   }
 
   @@file_line { "backuppc_host_${::fqdn}":
