@@ -111,59 +111,24 @@ $Conf{RsyncdClientPort} = 873;
 $Conf{RsyncdUserName} = '';
 $Conf{RsyncdPasswd} = '';
 $Conf{RsyncFullArgsExtra} = [
-      '--checksum',
+<% @rsync_full_extra_args.each do |rsync_full_extra_arg| -%>
+  '<%= rsync_full_extra_arg %>',
+<% end -%>
 ];
 $Conf{RsyncArgs} = [
-            '--super',
-            '--recursive',
-            '--protect-args',
-            '--numeric-ids',
-            '--perms',
-            '--owner',
-            '--group',
-            '-D',
-            '--times',
-            '--links',
-            '--hard-links',
-            '--delete',
-            '--delete-excluded',
-            '--one-file-system',
-            '--partial',
-            '--log-format=log: %o %i %B %8U,%8G %9l %f%L',
-            '--stats',
-	    #
-	    # Add additional arguments here, for example --acls or --xattrs
-            # if all the clients support them.
-	    #
-            #'--acls',
-            #'--xattrs',
+<% @rsync_args.each do |rsync_arg| -%>
+  '<%= rsync_arg %>',
+<% end -%>
 ];
 $Conf{RsyncArgsExtra} = [
-<% @rsync_args_extra.each do |arg| -%>
-  '<%= arg %>',
+<% @rsync_args_extra.each do |rsync_arg_extra| -%>
+  '<%= rsync_arg_extra %>',
 <% end -%>
 ];
 $Conf{RsyncRestoreArgs} = [
-            '--recursive',
-            '--super',
-            '--protect-args',
-            '--numeric-ids',
-            '--perms',
-            '--owner',
-            '--group',
-            '-D',
-            '--times',
-            '--links',
-            '--hard-links',
-            '--delete',
-            '--partial',
-            '--log-format=log: %o %i %B %8U,%8G %9l %f%L',
-            '--stats',
-	    #
-	    # Add additional arguments here
-	    #
-            #'--acls',
-            #'--xattrs',
+<% @rsync_restore_args.each do |rsync_restore_arg| -%>
+  '<%= rsync_restore_arg %>',
+<% end -%>
 ];
 $Conf{FtpShareName} = '';
 $Conf{FtpUserName} = '';
