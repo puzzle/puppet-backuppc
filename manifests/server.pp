@@ -89,9 +89,6 @@
 # incremental and tend to be small) are still performed, independent of disk usage. Also,
 # currently running backups will not be terminated when the disk usage exceeds this number.
 #
-# [*trash_clean_sleep_sec*]
-# How long BackupPC_trashClean sleeps in seconds between each check of the trash directory.
-#
 # [*dhcp_address_ranges*]
 # List of DHCP address ranges we search looking for PCs to backup. This is an array of
 # hashes for each class C address range. This is only needed if hosts in the conf/hosts
@@ -121,24 +118,6 @@
 # we keep at least $Conf{IncrKeepCntMin} incremental backups no matter how old
 # they are.
 #
-# [*incr_levels*]
-# A full backup has level 0. A new incremental of level N will backup all files
-# that have changed since the most recent backup of a lower level.
-#
-# [*partial_age_max*]
-# A failed full backup is saved as a partial backup. The rsync XferMethod can
-# take advantage of the partial full when the next backup is run. This parameter
-# sets the age of the partial full in days: if the partial backup is older than
-# this number of days, then rsync will ignore (not use) the partial full when the
-# next backup is run. If you set this to a negative value then no partials will be
-# saved. If you set this to 0, partials will be saved, but will not be used by the
-# next backup.
-#
-# [*incr_fill*]
-# Boolean. Whether incremental backups are filled. "Filling" means that the most recent fulli
-# (or filled) dump is merged into the new incremental dump using hardlinks. This
-# makes an incremental dump look like a full dump.
-#
 # [*restore_info_keep_cnt*]
 # Number of restore logs to keep. BackupPC remembers information about each restore
 # request. This number per client will be kept around before the oldest ones are pruned.
@@ -160,6 +139,9 @@
 #
 # [*rsync_ssh_args*]
 # Array. Passes the ssh arguments like login user and escape_char. Default: '-e', '$sshPath -l backup'
+#
+# [*rsync_args_extra*]
+# Array. Additional arguments added to RsyncArgs.
 #
 # [*ref_cnt_fsck*]
 # Reference counts of pool files are computed per backup by accumulating
@@ -242,7 +224,6 @@ class backuppc::server (
   $backup_pc_nightly_period   = 1,
   $max_old_log_files          = 14,
   $df_max_usage_pct           = 95,
-  $trash_clean_sleep_sec      = 300,
   $dhcp_address_ranges        = [],
   $rsync_backuppc_path        = '/usr/local/bin/rsync_bpc',
   $full_period                = '6.97',
@@ -251,9 +232,6 @@ class backuppc::server (
   $incr_period                = '0.97',
   $incr_keep_cnt              = 6,
   $incr_age_max               = 30,
-  $incr_levels                = [1],
-  $incr_fill                  = false,
-  $partial_age_max            = 3,
   $restore_info_keep_cnt      = 10,
   $archive_info_keep_cnt      = 10,
   $blackout_good_cnt          = 7,
@@ -264,14 +242,15 @@ class backuppc::server (
                                 }, ],
   $blackout_zero_files_is_fatal = true,
   $rsync_ssh_args             = [ '-e', "\$sshPath -l backup" ],
-  $ref_cnt_fsck                 = 1,
+  $rsync_args_extra           = [],
+  $ref_cnt_fsck               = 1,
   $email_notify_min_days      = 2.5,
   $email_from_user_name       = 'backuppc',
   $email_admin_user_name      = 'backuppc',
   $email_destination_domain   = '',
   $email_notify_old_backup_days = 7,
   $email_headers              = { 'MIME-Version' => 1.0,
-                                  'Content-Type' => 'text/plain; charset="iso-8859-1"', },
+                                  'Content-Type' => 'text/plain; charset="utf-8"', },
   $apache_configuration       = true,
   $apache_allow_from          = 'all',
   $apache_require_ssl         = false,
@@ -317,9 +296,6 @@ class backuppc::server (
   validate_re("${backup_pc_nightly_period}", '^[1-9]([0-9]*)?$',
   'Backup_pc_nightly_period parameter should be a number')
 
-  validate_re("${trash_clean_sleep_sec}",  '^[1-9]([0-9]*)?$',
-  'Trash_clean_sleep_sec parameter should be a number')
-
   validate_re("${full_period}", '^[0-9]([0-9]*)?(\.[0-9]{1,2})?$',
   'Full_period parameter should be a number')
 
@@ -334,9 +310,6 @@ class backuppc::server (
 
   validate_re("${incr_age_max}", '^[1-9]([0-9]*)?$',
   'Incr_age_max parameter should be a number')
-
-  validate_re("${partial_age_max}", '^[1-9]([0-9]*)?$',
-  'Partial_age_max parameter should be a number')
 
   validate_re("${restore_info_keep_cnt}", '^[1-9]([0-9]*)?$',
   'Restore_info_keep_cnt parameter should be a number')
@@ -361,7 +334,6 @@ class backuppc::server (
 
   validate_array($wakeup_schedule)
   validate_array($dhcp_address_ranges)
-  validate_array($incr_levels)
   validate_array($blackout_periods)
   validate_array($full_keep_cnt)
 
@@ -374,7 +346,6 @@ class backuppc::server (
   validate_string($cgi_admin_user_group)
   validate_string($cgi_admin_users)
 
-  $real_incr_fill = bool2num($incr_fill)
   $real_bzfif     = bool2num($blackout_zero_files_is_fatal)
   $real_uccs      = bool2num($user_cmd_check_status)
 
