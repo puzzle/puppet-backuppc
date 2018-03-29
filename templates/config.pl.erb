@@ -145,7 +145,7 @@ $Conf{ArchiveSplit} = 0;
 $Conf{ArchiveClientCmd} = '$Installdir/bin/BackupPC_archiveHost'
   . ' $tarCreatePath $splitpath $parpath $host $backupnumber'
   . ' $compression $compext $splitsize $archiveloc $parfile *';
-$Conf{SshPath} = '';
+$Conf{SshPath} = '/usr/bin/ssh';
 $Conf{NmbLookupPath} = '/usr/bin/nmblookup';
 $Conf{NmbLookupCmd} = '$nmbLookupPath -A $host';
 $Conf{NmbLookupFindHostCmd} = '$nmbLookupPath $host';
