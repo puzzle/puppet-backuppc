@@ -140,8 +140,12 @@
 # [*rsync_ssh_args*]
 # Array. Passes the ssh arguments like login user and escape_char. Default: '-e', '$sshPath -l backup'
 #
+# [*rsync_ssh_args*]
+# [*rsync_full_extra_args*]
+# [*rsync_args*]
 # [*rsync_args_extra*]
-# Array. Additional arguments added to RsyncArgs.
+# [*rsync_restore_args*]
+# Array. Corresponding to their CamelCased Options. Defaults from Standard config.
 #
 # [*ref_cnt_fsck*]
 # Reference counts of pool files are computed per backup by accumulating
@@ -242,7 +246,58 @@ class backuppc::server (
                                 }, ],
   $blackout_zero_files_is_fatal = true,
   $rsync_ssh_args             = [ '-e', "\$sshPath -l backup" ],
+  $rsync_full_extra_args      = [
+        '--checksum',
+  ],
+  $rsync_args                 = [
+        '--super',
+        '--recursive',
+        '--protect-args',
+        '--numeric-ids',
+        '--perms',
+        '--owner',
+        '--group',
+        '-D',
+        '--times',
+        '--links',
+        '--hard-links',
+        '--delete',
+        '--delete-excluded',
+        '--one-file-system',
+        '--partial',
+        '--log-format=log: %o %i %B %8U,%8G %9l %f%L',
+        '--stats',
+        #
+        # Add additional arguments here, for example --acls or --xattrs
+        # if all the clients support them.
+        #
+        #'--acls',
+        #'--xattrs',
+  ],
   $rsync_args_extra           = [],
+  $rsync_restore_args = [
+        '--recursive',
+        '--super',
+        '--protect-args',
+        '--numeric-ids',
+        '--perms',
+        '--owner',
+        '--group',
+        '-D',
+        '--times',
+        '--links',
+        '--hard-links',
+        '--delete',
+        '--partial',
+        '--log-format=log: %o %i %B %8U,%8G %9l %f%L',
+        '--stats',
+        #
+        # Add additional arguments here, for example --acls or --xattrs
+        # if all the clients support them.
+        #
+        #'--acls',
+        #'--xattrs',
+  ],
   $ref_cnt_fsck               = 1,
   $email_notify_min_days      = 2.5,
   $email_from_user_name       = 'backuppc',

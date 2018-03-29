@@ -38,7 +38,7 @@ class { 'backuppc::server':
   email_notify_min_days        => 1.5,
   email_from_user_name         => 'bpcreport',
   email_admin_user_name        => 'backuppc-alt',
-  email_destination_domain     => '@example.com'
+  email_destination_domain     => '@example.com',
   email_notify_old_backup_days => 7,
   apache_allow_from            => '127.0.0.1',
 }
