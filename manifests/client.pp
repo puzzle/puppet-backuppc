@@ -46,10 +46,10 @@
 # [*manage_ssh*]
 # Default: true
 # Manage sshkey export and collection
-# Boolean. By default will manage the generation and deployment of the 
-# sshkey and authorized keys. If you manage this elsewhere set it to false. 
+# Boolean. By default will manage the generation and deployment of the
+# sshkey and authorized keys. If you manage this elsewhere set it to false.
 # Defaults to true and  is only applied if 1) the xfer_method is rsync and
-# 2) you're using the system_account parameter. 
+# 2) you're using the system_account parameter.
 # Additional options in class backuppc::client::ssh
 # Also check backuppc::server::manage_ssh and class backuppc::server::ssh
 #
@@ -223,7 +223,7 @@
 #
 # [*sudo_prepend*]
 # Prepend a command to the sudo command, as run in backuppc.sh. This is mostly
-# useful for running the backup via nice or ionice, in order to reduce the 
+# useful for running the backup via nice or ionice, in order to reduce the
 # impact of large backups on the client.
 #
 # === Examples
@@ -305,11 +305,6 @@ class backuppc::client (
 
   validate_re($ensure, '^(present|absent)$',
   'ensure parameter must have a value of: present or absent')
-
-  $directory_ensure = $ensure ? {
-    'present' => 'directory',
-    default   => absent,
-  }
 
   if empty($backuppc_hostname) {
     fail('Please provide the hostname of the node that hosts backuppc.')

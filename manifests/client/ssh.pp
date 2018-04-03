@@ -21,6 +21,10 @@ class backuppc::client::ssh(
   $system_home_directory = $backuppc::client::system_home_directory
   $backuppc_hostname     = $backuppc::client::backuppc_hostname
 
+  $directory_ensure = $ensure ? {
+    'present' => 'directory',
+    default   => absent,
+  }
   file { "${system_home_directory}/.ssh":
     ensure => $directory_ensure,
     mode   => '0700',
