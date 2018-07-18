@@ -531,8 +531,7 @@ class backuppc::server (
       environment => ['LC_ALL=C'],
       path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
       unless      => "test \"$(sed -rn '/#puppetmanaged/ s/^([^ ]+).*/\\1/p' ${backuppc::params::hosts} | sort | tr -d '\\n')\" = \"${hostsstr}\"",
-      before      => File_line <<| tag == "backuppc_hosts_${::fqdn}" |>>
-    }
+    } -> File_line <<| tag == "backuppc_hosts_${::fqdn}" |>>
   }
 
   # Hosts
@@ -542,7 +541,7 @@ class backuppc::server (
     require => File["${backuppc::params::config_directory}/pc"],
   }
   File_line <<| tag == "backuppc_hosts_${::fqdn}" |>> {
-    require => [Package[$backuppc::params::package],
+    require => Package[$backuppc::params::package],
     notify  => Service[$backuppc::params::service],
   }
 
