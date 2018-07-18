@@ -208,6 +208,10 @@
 # Default: true
 # Manage sshkey export and collection
 #
+# [*tidy_hosts_file*]
+# Default: true
+# Remove entries in hosts file that are not managed by puppet anymore.
+#
 # === Examples
 #
 #  See tests folder.
@@ -319,6 +323,7 @@ class backuppc::server (
   $user_cmd_check_status      = true,
   $pingmaxmsec                = 20,
   $manage_ssh                 = true,
+  $tidy_hosts_file            = true,
 ) inherits backuppc::params  {
 
   if empty($backuppc_password) {
@@ -514,17 +519,20 @@ class backuppc::server (
     }
   }
 
-  # Since we now tag the hosts that are managed by
-  # puppet, check the current hosts file and compare
-  # it with what is in puppetdb.
-  $dbhosts = query_nodes("Class[backuppc::client]{backuppc_hostname=\"${::fqdn}\"}")
-  $hostsstr = join(sort($dbhosts), '')
+  if $tidy_hosts_file {
+    # Since we now tag the hosts that are managed by
+    # puppet, check the current hosts file and compare
+    # it with what is in puppetdb.
+    $dbhosts = query_nodes("Class[backuppc::client]{backuppc_hostname=\"${::fqdn}\"}")
+    $hostsstr = join(sort($dbhosts), '')
 
-  exec { 'tidy_hosts_file':
-    command     => "sed -i '/#puppetmanaged$/d' ${backuppc::params::hosts}",
-    environment => ['LC_ALL=C'],
-    path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
-    unless      => "test \"$(sed -rn '/#puppetmanaged/ s/^([^ ]+).*/\\1/p' ${backuppc::params::hosts} | sort | tr -d '\\n')\" = \"${hostsstr}\"",
+    exec { 'tidy_hosts_file':
+      command     => "sed -i '/#puppetmanaged$/d' ${backuppc::params::hosts}",
+      environment => ['LC_ALL=C'],
+      path        => '/usr/bin:/usr/sbin:/bin:/usr/local/bin',
+      unless      => "test \"$(sed -rn '/#puppetmanaged/ s/^([^ ]+).*/\\1/p' ${backuppc::params::hosts} | sort | tr -d '\\n')\" = \"${hostsstr}\"",
+      before      => File_line <<| tag == "backuppc_hosts_${::fqdn}" |>>
+    }
   }
 
   # Hosts
@@ -534,7 +542,7 @@ class backuppc::server (
     require => File["${backuppc::params::config_directory}/pc"],
   }
   File_line <<| tag == "backuppc_hosts_${::fqdn}" |>> {
-    require => [Package[$backuppc::params::package],Exec['tidy_hosts_file']],
+    require => [Package[$backuppc::params::package],
     notify  => Service[$backuppc::params::service],
   }
 
